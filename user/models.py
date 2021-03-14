@@ -1,11 +1,19 @@
 from django.db import models
 
+class Gender(models.Model):
+    name = models.CharField(max_length=5)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'genders'
 
 class User(models.Model):
     email = models.EmailField(max_length=50, unique=True)
-    password = models.CharField(max_length=16)
+    password = models.CharField(max_length=256)
     number = models.CharField(max_length=11, unique=True)
-    gender = models.NullBooleanField()
+    gender = models.ForeignKey('Gender', on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
