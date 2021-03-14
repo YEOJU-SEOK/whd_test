@@ -1,8 +1,8 @@
 from django.db import models
-
+from datetime import datetime, timedelta
 
 def get_deadline():
-    return datetime.today() + timedelta(days=7)
+    return datetime.today() + timedelta(7)
 
 
 class Product(models.Model):

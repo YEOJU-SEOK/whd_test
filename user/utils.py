@@ -22,7 +22,7 @@ def login_auth(func):
         except jwt.DecodeError:
             return JsonResponse({"message":"DECODE_ERROR"}, status=401)
         except User.DoesNotExist:
-            return JsonResponse({"message":"INVALID_USER"}. satatus=401)
+            return JsonResponse({"message":"INVALID_USER"}, satatus=401)
         except jwt.ExpiredSignatureError:
             return JsonResponse({"message":"EXPIRED_TOKEN"}, status=401)
         except jwt.InvalidTokenError:
