@@ -6,11 +6,12 @@ from django.views import View
 from django.http import JsonResponse
 
 from my_settings import SECRET, ALGORITHM
-from .models import User, Gender
-from .utils import login_auth
+from user.models import User, Gender, Address
+from user.utils import login_auth
 
+
+#회원가입
 class SignUpView(View):
-
     def validate_email(self, email):
         REGEX_EMAIL = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
         return re.match(REGEX_EMAIL, email)
@@ -52,6 +53,8 @@ class SignUpView(View):
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"},status=401)
 
+
+#로그인
 class SignInView(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -61,11 +64,45 @@ class SignInView(View):
                 return JsonResponse({"message":"INVALID_USER"}, status=401)
             if not bcrypt.checkpw(data['password'].encode('utf-8'), User.objects.get(email=data['email']).password.encode('utf-8')):
                 return JsonResponse({"message":"INVALID_PASSWORD"}, status=401)
-            #accesstoken decode...뭐지?
-            access_token = jwt.encode({'id':User.objects.get(email=data['email']).id, 'exp': datetime.now() + timedelta(hours=24)}, SECRET, ALGORITHM).decode('utf-8')
+
+            access_token = jwt.encode({'id':User.objects.get(email=data['email']).id, 'exp': datetime.now() + timedelta(hours=24)}, SECRET, ALGORITHM)
+            print(access_token)
+            print("type:", type(access_token))
             return JsonResponse({"message":"SUCCESS", "TOKEN":access_token}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({"message":"FAILDED_TO_DECODE_DATA"}, status=400)
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"}, status=403)
+
+#정보조회&업데이트
+class UserView(View):
+    @login_auth
+    def get(self, request):
+        user = request.user    
+        if not user:
+            return JsonResponse({"mesage":"USER_NOT_FOUND"}, status=404)
+        result = [{
+            'email' : user.email,
+            'number' : user.number,
+            'gender' : user.gender.name
+        }]
+        return JsonResponse({'message':'SUCCESS', 'results': result}, status=200)
+
+    @login_auth
+    def patch(self, request, user_id):
+        user = request.user
+        try:
+            if User.objects.filter(id=user_id):
+                user = User.objects.get(id=user_id)
+                
+                user.number = data.get('number', user.number)
+                user.gender = data.get('gender', user.gender)
+                
+                user.save()
+                return JsonResponse({"message" : "SUCCESS"}, status=201)
+
+            return JsonResponse({"message" : "INVALID_APPROACH"}, status=400)       
+
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)         
