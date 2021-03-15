@@ -13,7 +13,6 @@ inflection==0.5.1
 itypes==1.2.0
 Jinja2==2.11.3
 MarkupSafe==1.1.1
-mysqlclient==2.0.3
 packaging==20.9
 pycparser==2.20
 PyJWT==2.0.1
