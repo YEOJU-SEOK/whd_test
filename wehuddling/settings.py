@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'user',
     'order',
-    'product'
+    'product',
+    'drf_yasg',        
+    'rest_framework', 
 ]
 
 MIDDLEWARE = [
